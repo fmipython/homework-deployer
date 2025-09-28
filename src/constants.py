@@ -1,3 +1,7 @@
+"""
+Constants used across the application.
+"""
+
 import os
 
 VERSION = "1.0.0"

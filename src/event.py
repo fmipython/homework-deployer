@@ -1,9 +1,17 @@
+"""
+Event model representing a deployment event.
+"""
+
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 
 
 class Event(BaseModel):
+    """
+    Deployment event model.
+    """
+
     id: int
     name: str
     description: str
