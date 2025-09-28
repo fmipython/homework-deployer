@@ -21,3 +21,30 @@ Detailed functionalities:
 - Pull files from a (private) repository.
 - Push files to a repository.
 - Run CI/CD actions (this is more of a wish).
+
+## Config files
+
+### Patterns supported
+
+#### Source pattern
+
+- File - Copy single file
+- Directory - Copy entier directory
+- Glob - Copy files and directories matching the pattern
+
+#### Destination pattern
+
+- None - Keep the original structure
+- File - Copy the file to the given name
+- Directory - Copy the contents to the given directory
+
+Example:
+If `A` and `B` are the root of the repositories.
+
+||None|File (`d/g.txt`)|Directory (`B/h`)|
+|----|----|----|----|
+|**File** (`A/c/e.txt`)|`B/c/e.txt`|`B/d/e.txt`|`B/h/e.txt`|
+|**Directory** (`A/c`)|`B/c`|Error|`B/h`|
+|**Glob** (`A/c/*.py`)|`B/c/*.py`|Error|`B/h/*.py`|
+
+*Note - no need to pass the repo path in the patterns part.*
