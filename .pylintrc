@@ -1,4 +1,2 @@
-[MASTER]
-
-# Ignore TODO comments
-disable=W0511 
+[FORMAT]
+max-line-length=120
