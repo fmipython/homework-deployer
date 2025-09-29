@@ -3,10 +3,12 @@ Main module
 """
 
 from datetime import datetime
+from src.cli import get_args
 from src.event import Event
 from src.executor import execute
 
 if __name__ == "__main__":
+    _ = get_args()
     e = Event(
         id=1,
         name="Test Event",
