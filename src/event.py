@@ -12,7 +12,7 @@ class Event(BaseModel):
     Deployment event model.
     """
 
-    id: int
+    id: str
     name: str
     description: str
     origin: str

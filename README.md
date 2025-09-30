@@ -13,11 +13,11 @@ The script will take care of the scheduling, execution, access and everything el
 
 Detailed functionalities:
 
-- Register a deployment event.
-- List all deployment events.
-- Deregister a deployment event.
-- Manually run a deployment event.
-- Execute deployment events.
+- Register a deployment event. (`python3 homework-deployer.py register hw1.json`)
+- List all deployment events. (`python3 homework-deployer.py list`)
+- Deregister a deployment event. (`python3 homework-deployer.py deregister 1`)
+- Manually run a deployment event. (`python3 homework-deployer.py run 1`)
+
 - Pull files from a (private) repository.
 - Push files to a repository.
 - Run CI/CD actions (this is more of a wish).
