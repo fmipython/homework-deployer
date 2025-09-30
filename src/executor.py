@@ -107,5 +107,5 @@ def commit_changes(repo: Repo, message: str) -> None:
     repo.git.add(A=True)
     if repo.is_dirty():
         repo.index.commit(message)
-        # origin = repo.remote(name='origin')
-        # origin.push()
+        origin = repo.remote(name="origin")
+        origin.push()
