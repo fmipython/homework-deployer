@@ -3,7 +3,7 @@ import json
 from src.event import Event
 
 
-def load(db_path: str) -> dict[str, str]:
+def load(db_path: str) -> dict[str, tuple[int, str]]:
     """
     Load the database from a JSON file.
 
@@ -18,7 +18,7 @@ def load(db_path: str) -> dict[str, str]:
         return {}
 
 
-def add(db_path: str, event: Event, config_path: str) -> None:
+def add(db_path: str, event: Event, config_path: str, at_id: int) -> None:
     """
     Add a new event to the database.
 
@@ -26,7 +26,7 @@ def add(db_path: str, event: Event, config_path: str) -> None:
     :param event: The Event object to add.
     """
     db = load(db_path)
-    db[event.id] = config_path
+    db[event.id] = at_id, config_path
 
     with open(db_path, "w", encoding="utf-8") as db_file:
         json.dump(db, db_file, indent=4)
@@ -45,5 +45,3 @@ def remove(db_path: str, event_id: str) -> None:
 
         with open(db_path, "w", encoding="utf-8") as db_file:
             json.dump(db, db_file, indent=4)
-
-    # TODO - Add removal from 'at' scheduler
