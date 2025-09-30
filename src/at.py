@@ -1,4 +1,5 @@
 from subprocess import run
+from typing import Optional
 
 import src.constants as const
 from src.event import Event
@@ -16,7 +17,7 @@ def is_at_available() -> bool:
     return output.returncode == 0
 
 
-def register(event: Event) -> bool:
+def register(event: Event) -> Optional[int]:
     """
     Register a deployment event using the 'at' command-line utility.
 
@@ -27,5 +28,23 @@ def register(event: Event) -> bool:
     command_to_execute = "touch /tmp/at_test_file"  # Placeholder command
 
     output = run(at_command, input=command_to_execute, check=False, text=True, capture_output=True)
+
+    if output.returncode != 0:
+        return None
+
+    at_id = int(output.stderr.split()[1])
+    return at_id
+
+
+def deregister(at_id: int) -> bool:
+    """
+    Deregister a deployment event using the 'at' command-line utility.
+
+    :param at_id: The ID of the scheduled job to remove.
+    :return: True if deregistration is successful, False otherwise.
+    """
+    at_command = [const.AT_BINARY, "-r", str(at_id)]
+
+    output = run(at_command, check=False, text=True, capture_output=True)
 
     return output.returncode == 0
