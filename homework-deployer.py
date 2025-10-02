@@ -45,6 +45,3 @@ if __name__ == "__main__":
             execute(event)
         case _:
             print("Unknown command")
-
-    # execute(e)
-    # at.register(e)
