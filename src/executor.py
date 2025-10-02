@@ -59,11 +59,19 @@ def expand_patterns(
     source_repo = Path(source_path)
     destination_repo = Path(destination_path)
 
-    return [
-        expand_pattern(path, dest_pattern, source_repo, destination_repo)
-        for source_pattern, dest_pattern in patterns
-        for path in source_repo.glob(source_pattern)
-    ]
+    result = []
+
+    for source_pattern, dest_pattern in patterns:
+        if (
+            any(char in source_pattern for char in ("*", "?", "[", "]"))
+            and dest_pattern is not None
+            and Path(dest_pattern).is_file()
+        ):
+            raise PatternError("Destination pattern cannot be file if source pattern is a glob")
+        for path in source_repo.glob(source_pattern):
+            result.append(expand_pattern(path, dest_pattern, source_repo, destination_repo))
+
+    return result
 
 
 def expand_pattern(
@@ -78,10 +86,21 @@ def expand_pattern(
     :param destination_repo: Path object for the destination repository root.
     :return: Tuple of source and destination file paths.
     """
-    source_file = source_file.relative_to(source_repo)
 
     source_full_path = source_repo / source_file
-    destination_full_path = destination_repo / (source_file if dest_pattern is None else Path(dest_pattern))
+
+    if dest_pattern is None:
+        destination_full_path = destination_repo / source_file
+    else:
+        dest_pattern_path = Path(dest_pattern)
+
+        if source_file.is_dir() and dest_pattern_path.is_file():
+            raise PatternError("Cannot use directory pattern for file source")
+
+        if source_file.is_file() and dest_pattern_path.is_dir():
+            dest_pattern_path = dest_pattern_path / source_file.name
+
+        destination_full_path = destination_repo / dest_pattern_path
 
     return source_full_path, destination_full_path
 
@@ -109,3 +128,9 @@ def commit_changes(repo: Repo, message: str) -> None:
         repo.index.commit(message)
         origin = repo.remote(name="origin")
         origin.push()
+
+
+class PatternError(Exception):
+    """
+    Custom exception for pattern expansion errors.
+    """

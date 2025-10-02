@@ -10,7 +10,8 @@ from unittest.mock import patch, MagicMock
 from git import Repo
 from git.exc import GitCommandError
 
-from src.executor import execute, clone_repo, expand_patterns, expand_pattern, copy_files, commit_changes
+import src.constants as const
+from src.executor import execute, clone_repo, expand_patterns, expand_pattern, copy_files, commit_changes, PatternError
 from src.event import Event
 
 
@@ -55,8 +56,8 @@ class TestExecute(unittest.TestCase):
         execute(event)
 
         # Assert
-        mock_clone.assert_any_call(event.origin, "/tmp/homework-deployer/source")
-        mock_clone.assert_any_call(event.destination, "/tmp/homework-deployer/destination")
+        mock_clone.assert_any_call(event.origin, const.SOURCE_REPO_DIR)
+        mock_clone.assert_any_call(event.destination, const.DESTINATION_REPO_DIR)
         mock_expand.assert_called_once()
         mock_copy.assert_called_once()
         mock_commit.assert_called_once()
@@ -115,7 +116,7 @@ class TestExpandPatterns(unittest.TestCase):
         source_path = "/source"
         dest_path = "/dest"
         patterns: list[tuple[str, str | None]] = [("*.txt", None)]
-        mock_glob.return_value = [Path("/source/test.txt")]
+        mock_glob.return_value = [Path("test.txt")]
 
         # Act
         result = expand_patterns(source_path, dest_path, patterns)
@@ -125,23 +126,21 @@ class TestExpandPatterns(unittest.TestCase):
         self.assertEqual(result[0], (Path("/source/test.txt"), Path("/dest/test.txt")))
 
     @patch("pathlib.Path.glob")
-    def test_02_multiple_patterns_with_destination(self, mock_glob: MagicMock) -> None:
+    @patch("pathlib.Path.is_file")
+    def test_03_source_glob_with_file_destination(self, mock_is_file: MagicMock, mock_glob: MagicMock) -> None:
         """
         Verify correct path transformations for patterns with destinations.
         """
         # Arrange
         source_path = "/source"
         dest_path = "/dest"
-        patterns: list[tuple[str, str | None]] = [("c/e.txt", "d/g.txt"), ("c/*.py", "h")]
+        patterns: list[tuple[str, str | None]] = [("c/*.py", "h/a.py")]
         mock_glob.side_effect = [[Path("/source/c/e.txt")], [Path("/source/c/test.py")]]
+        mock_is_file.return_value = True
 
         # Act
-        result = expand_patterns(source_path, dest_path, patterns)
-
-        # Assert
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[0], (Path("/source/c/e.txt"), Path("/dest/d/g.txt")))
-        self.assertEqual(result[1], (Path("/source/c/test.py"), Path("/dest/h/test.py")))
+        with self.assertRaises(PatternError):
+            _ = expand_patterns(source_path, dest_path, patterns)
 
 
 class TestExpandPattern(unittest.TestCase):
@@ -149,36 +148,139 @@ class TestExpandPattern(unittest.TestCase):
     Test suite for the expand_pattern function.
     """
 
-    def test_01_without_destination_pattern(self) -> None:
+    def test_01_file_to_none_pattern(self) -> None:
         """
-        Verify path generation without destination pattern.
-        """
-        # Arrange
-        source_file = Path("/source/test/file.txt")
-        source_repo = Path("/source")
-        destination_repo = Path("/dest")
-
-        # Act
-        result = expand_pattern(source_file, None, source_repo, destination_repo)
-
-        # Assert
-        self.assertEqual(result, (source_file, Path("/dest/test/file.txt")))
-
-    def test_02_with_destination_pattern(self) -> None:
-        """
-        Verify path generation with destination pattern.
+        Verify correct path pair for file-to-file pattern.
         """
         # Arrange
-        source_file = Path("/source/test/file.txt")
-        dest_pattern = "new/path/renamed.txt"
         source_repo = Path("/source")
         destination_repo = Path("/dest")
+        source_file = Path("c/e.txt")
+        destination_pattern = None
+
+        expected_source = source_repo / source_file
+        expected_destination = destination_repo / source_file
 
         # Act
-        result = expand_pattern(source_file, dest_pattern, source_repo, destination_repo)
+        actual_source, actual_destination = expand_pattern(
+            source_file, destination_pattern, source_repo, destination_repo
+        )
 
         # Assert
-        self.assertEqual(result, (source_file, Path("/dest/new/path/renamed.txt")))
+        self.assertEqual(actual_source, expected_source)
+        self.assertEqual(actual_destination, expected_destination)
+
+    def test_02_file_to_file_pattern(self) -> None:
+        """
+        Verify correct path pair for file-to-file pattern.
+        """
+        # Arrange
+        source_repo = Path("/source")
+        destination_repo = Path("/dest")
+        source_file = Path("c/e.txt")
+        destination_pattern = "d/g.txt"
+
+        expected_source = source_repo / source_file
+        expected_destination = destination_repo / Path(destination_pattern)
+
+        # Act
+        actual_source, actual_destination = expand_pattern(
+            source_file, destination_pattern, source_repo, destination_repo
+        )
+
+        # Assert
+        self.assertEqual(actual_source, expected_source)
+        self.assertEqual(actual_destination, expected_destination)
+
+    @patch("pathlib.Path.is_dir")
+    def test_03_file_to_directory_pattern(self, mock_is_dir: MagicMock) -> None:
+        """
+        Verify correct path pair for file-to-file pattern.
+        """
+        # Arrange
+        source_repo = Path("/source")
+        destination_repo = Path("/dest")
+        source_file = MagicMock(spec=Path)
+        source_file.name = "e.txt"
+        source_file.is_file.return_value = True
+
+        mock_is_dir.return_value = True
+
+        destination_pattern = "h"
+
+        expected_source = source_repo / source_file
+        expected_destination = destination_repo / Path(destination_pattern) / source_file.name
+
+        # Act
+        actual_source, actual_destination = expand_pattern(
+            source_file, destination_pattern, source_repo, destination_repo
+        )
+
+        # Assert
+        self.assertEqual(actual_source, expected_source)
+        self.assertEqual(actual_destination, expected_destination)
+
+    def test_04_directory_to_none_pattern(self) -> None:
+        """
+        Verify correct path pair for file-to-file pattern.
+        """
+        # Arrange
+        source_repo = Path("/source")
+        destination_repo = Path("/dest")
+        source_file = Path("c")
+        destination_pattern = None
+
+        expected_source = source_repo / source_file
+        expected_destination = destination_repo / source_file
+
+        # Act
+        actual_source, actual_destination = expand_pattern(
+            source_file, destination_pattern, source_repo, destination_repo
+        )
+
+        # Assert
+        self.assertEqual(actual_source, expected_source)
+        self.assertEqual(actual_destination, expected_destination)
+
+    @patch("pathlib.Path.is_file")
+    @patch("pathlib.Path.is_dir")
+    def test_05_directory_to_file_pattern(self, mock_is_dir: MagicMock, mock_is_file: MagicMock) -> None:
+        """
+        Verify correct path pair for file-to-file pattern.
+        """
+        # Arrange
+        source_repo = Path("/source")
+        destination_repo = Path("/dest")
+        source_file = Path("c/e.txt")
+        destination_pattern = "d/g.txt"
+
+        mock_is_file.return_value = True
+        mock_is_dir.return_value = True
+        # Act
+        with self.assertRaises(PatternError):
+            _ = expand_pattern(source_file, destination_pattern, source_repo, destination_repo)
+
+    def test_06_directory_to_directory_pattern(self) -> None:
+        """
+        Verify correct path pair for file-to-file pattern.
+        """
+        # Arrange
+        source_repo = Path("/source")
+        destination_repo = Path("/dest")
+        source_file = Path("c")
+        destination_pattern = "h"
+
+        expected_source = source_repo / source_file
+        expected_destination = destination_repo / Path(destination_pattern)
+
+        # Act
+        actual_source, actual_destination = expand_pattern(
+            source_file, destination_pattern, source_repo, destination_repo
+        )
+
+        # Assert
+        self.assertEqual(actual_source, expected_source)
+        self.assertEqual(actual_destination, expected_destination)
 
 
 class TestCopyFiles(unittest.TestCase):
