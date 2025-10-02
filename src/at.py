@@ -1,3 +1,7 @@
+"""
+Module to handle scheduling deployment events using the 'at' command-line utility.
+"""
+
 from subprocess import run
 from typing import Optional
 

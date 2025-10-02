@@ -1,3 +1,7 @@
+"""
+Persistent storage for deployment events using a JSON file.
+"""
+
 import json
 
 from src.event import Event
