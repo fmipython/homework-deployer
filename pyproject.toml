@@ -17,3 +17,13 @@ dev = [
     "mypy>=1.18.2",
     "pylint>=3.3.8",
 ]
+
+[tool.complexipy]
+paths = ["src", "tests"]
+max-complexity-allowed = 10
+quiet = false
+sort = "asc"
+details = "low"
+
+[tool.complexipy.output]
+json = true
