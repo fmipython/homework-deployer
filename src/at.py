@@ -2,6 +2,8 @@
 Module to handle scheduling deployment events using the 'at' command-line utility.
 """
 
+import sys
+
 from subprocess import run
 from typing import Optional
 
@@ -29,7 +31,7 @@ def register(event: Event) -> Optional[int]:
     :return: True if registration is successful, False otherwise.
     """
     at_command = [const.AT_BINARY, "-t", event.date.strftime("%y%m%d%H%M")]
-    command_to_execute = "touch /tmp/at_test_file"  # Placeholder command
+    command_to_execute = build_command(event)
 
     output = run(at_command, input=command_to_execute, check=False, text=True, capture_output=True)
 
@@ -52,3 +54,14 @@ def deregister(at_id: int) -> bool:
     output = run(at_command, check=False, text=True, capture_output=True)
 
     return output.returncode == 0
+
+
+def build_command(event: Event) -> str:
+    """
+    Build the command to be scheduled with 'at' for executing the deployment event.
+
+    :param event: The Event object containing deployment details.
+    :return: The command string to be executed.
+    """
+    command = f"{sys.executable} {const.SCRIPT_PATH} run --event-id {event.id} --no-push --no-remove"
+    return command

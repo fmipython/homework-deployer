@@ -16,6 +16,8 @@ DESTINATION_REPO_DIR = os.path.join(WORK_DIR, "destination_repo")
 AT_BINARY = "at"
 DB_PATH = "db.json"
 
+SCRIPT_PATH = os.path.abspath("homework-deployer.py")
+
 
 class ActionType(enum.Enum):
     REGISTER = "register"
