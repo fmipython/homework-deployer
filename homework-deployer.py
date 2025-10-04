@@ -24,6 +24,8 @@ if __name__ == "__main__":
 
             if at_id is not None:
                 db.add(const.DB_PATH, event, config_path, at_id)
+
+            print("Registered event with id:", event.id)
         case const.ActionType.DEREGISTER:
             event_id = args["event_id"]
             events = db.load(const.DB_PATH)
