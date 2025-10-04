@@ -12,7 +12,7 @@ import src.constants as const
 from src.event import Event
 
 
-def execute(event: Event, is_no_push: bool = False) -> None:
+def execute(event: Event, is_no_push: bool = False, is_no_remove: bool = False) -> None:
     """
     Execute the deployment event by cloning repositories, copying files according to patterns,
     committing changes, and cleaning up the working directory.
@@ -33,7 +33,8 @@ def execute(event: Event, is_no_push: bool = False) -> None:
     if not is_no_push:
         push_changes(cloned_destination_repo)
 
-    shutil.rmtree(const.WORK_DIR)
+    if not is_no_remove:
+        shutil.rmtree(const.WORK_DIR)
 
 
 def clone_repo(url: str, destination: str) -> Repo:

@@ -32,6 +32,7 @@ def get_args() -> dict[str, Any]:
     run_parser = subparsers.add_parser("run", help="Run a deployment event")
     run_parser.add_argument("event_id", type=str, help="ID of the event to run")
     run_parser.add_argument("--no-push", action="store_true", help="Skip pushing changes to remote")
+    run_parser.add_argument("--no-remove", action="store_true", help="Skip removing local repos")
 
     parser.add_argument("--version", action="version", help="Show the version of the tool", version=VERSION)
 

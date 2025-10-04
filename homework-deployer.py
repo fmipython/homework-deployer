@@ -38,11 +38,12 @@ if __name__ == "__main__":
         case const.ActionType.RUN:
             event_id = args["event_id"]
             is_no_push = args["no_push"]
+            is_no_remove = args["no_remove"]
             events = db.load(const.DB_PATH)
             config_path = events[event_id][1]
             with open(config_path, "r", encoding="utf-8") as config:
                 event = Event.model_validate_json(config.read())
 
-            execute(event)
+            execute(event, is_no_push, is_no_remove)
         case _:
             print("Unknown command")
