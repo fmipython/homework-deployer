@@ -11,7 +11,15 @@ from git import Repo
 from git.exc import GitCommandError
 
 import homework_deployer.constants as const
-from homework_deployer.executor import execute, clone_repo, expand_patterns, expand_pattern, copy_files, commit_changes, PatternError
+from homework_deployer.executor import (
+    execute,
+    clone_repo,
+    expand_patterns,
+    expand_pattern,
+    copy_files,
+    commit_changes,
+    PatternError,
+)
 from homework_deployer.event import Event
 
 
@@ -200,8 +208,9 @@ class TestExpandPattern(unittest.TestCase):
         # Arrange
         source_repo = Path("/source")
         destination_repo = Path("/dest")
-        source_file = MagicMock(spec=Path)
+        source_file = MagicMock(spec=Path, path=Path("c/e.txt"))
         source_file.name = "e.txt"
+        source_file.is_absolute.return_value = False
         source_file.is_file.return_value = True
 
         mock_is_dir.return_value = True

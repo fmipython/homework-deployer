@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime
 
 
-from homework_deployer.at import is_at_available, register, deregister
+from homework_deployer.at import is_at_available, register, deregister, build_command
 from homework_deployer.event import Event
 
 
@@ -116,7 +116,7 @@ class TestRegister(unittest.TestCase):
             patterns=[("*.txt", None)],
         )
         expected_command = ["at", "-t", "2401011200"]
-        expected_input = "touch /tmp/at_test_file"
+        expected_input = build_command(event)
 
         # Act
         register(event)
