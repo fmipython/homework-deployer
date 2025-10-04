@@ -37,6 +37,7 @@ if __name__ == "__main__":
 
         case const.ActionType.RUN:
             event_id = args["event_id"]
+            is_no_push = args["no_push"]
             events = db.load(const.DB_PATH)
             config_path = events[event_id][1]
             with open(config_path, "r", encoding="utf-8") as config:

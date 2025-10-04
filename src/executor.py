@@ -12,7 +12,7 @@ import src.constants as const
 from src.event import Event
 
 
-def execute(event: Event) -> None:
+def execute(event: Event, is_no_push: bool = False) -> None:
     """
     Execute the deployment event by cloning repositories, copying files according to patterns,
     committing changes, and cleaning up the working directory.
@@ -29,6 +29,9 @@ def execute(event: Event) -> None:
     )
     copy_files(paths)
     commit_changes(cloned_destination_repo, f"Automated commit for event {event.id}")
+
+    if not is_no_push:
+        push_changes(cloned_destination_repo)
 
     shutil.rmtree(const.WORK_DIR)
 
@@ -126,8 +129,16 @@ def commit_changes(repo: Repo, message: str) -> None:
     repo.git.add(A=True)
     if repo.is_dirty():
         repo.index.commit(message)
-        origin = repo.remote(name="origin")
-        origin.push()
+
+
+def push_changes(repo: Repo) -> None:
+    """
+    Push changes to the remote repository.
+
+    :param repo: The Repo object representing the git repository.
+    """
+    origin = repo.remote(name="origin")
+    origin.push()
 
 
 class PatternError(Exception):
