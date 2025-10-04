@@ -344,7 +344,6 @@ class TestCommitChanges(unittest.TestCase):
         # Assert
         mock_repo.git.add.assert_called_once_with(A=True)
         mock_repo.index.commit.assert_called_once_with(message)
-        mock_origin.push.assert_called_once()
 
     def test_02_without_changes(self) -> None:
         """

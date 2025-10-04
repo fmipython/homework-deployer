@@ -91,6 +91,9 @@ def expand_pattern(
     :return: Tuple of source and destination file paths.
     """
 
+    if source_file.is_absolute():
+        source_file = source_file.relative_to(source_repo)
+
     source_full_path = source_repo / source_file
 
     if dest_pattern is None:
