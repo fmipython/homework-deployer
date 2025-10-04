@@ -7,8 +7,8 @@ import sys
 from subprocess import run
 from typing import Optional
 
-import src.constants as const
-from src.event import Event
+import homework_deployer.constants as const
+from homework_deployer.event import Event
 
 
 def is_at_available() -> bool:

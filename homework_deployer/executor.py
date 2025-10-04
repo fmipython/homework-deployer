@@ -8,8 +8,8 @@ from typing import Optional
 
 from git import Repo
 
-import src.constants as const
-from src.event import Event
+import homework_deployer.constants as const
+from homework_deployer.event import Event
 
 
 def execute(event: Event, is_no_push: bool = False, is_no_remove: bool = False) -> None:

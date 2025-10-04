@@ -7,9 +7,9 @@ init:
     pip install -r requirements.txt
 
 lint: venv
-    python3 -m pylint src homework-deployer.py --fail-under 9
-    mypy src homework-deployer.py --ignore-missing-imports
-    flake8 src homework-deployer.py
+    python3 -m pylint homework_deployer homework-deployer.py --fail-under 9
+    mypy homework_deployer homework-deployer.py --ignore-missing-imports
+    flake8 homework_deployer homework-deployer.py
     complexipy .
 
 test: venv
@@ -19,8 +19,8 @@ push: venv lint test
     git push
 
 coverage: venv
-    coverage run --source=src -m unittest discover -s tests
+    coverage run --source=homework_deployer -m unittest discover -s tests
     coverage report -m --fail-under 75 --sort=cover
 
 run: venv
-    python3 src/main.py
+    python3 -m homework_deployer

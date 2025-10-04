@@ -4,7 +4,7 @@ Persistent storage for deployment events using a JSON file.
 
 import json
 
-from src.event import Event
+from homework_deployer.event import Event
 
 
 def load(db_path: str) -> dict[str, tuple[int, str]]:

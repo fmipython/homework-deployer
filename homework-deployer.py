@@ -2,7 +2,7 @@
 Main module
 """
 
-from src import main
+from homework_deployer import main
 
 
 if __name__ == "__main__":

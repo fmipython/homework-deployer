@@ -10,9 +10,9 @@ from unittest.mock import patch, MagicMock
 from git import Repo
 from git.exc import GitCommandError
 
-import src.constants as const
-from src.executor import execute, clone_repo, expand_patterns, expand_pattern, copy_files, commit_changes, PatternError
-from src.event import Event
+import homework_deployer.constants as const
+from homework_deployer.executor import execute, clone_repo, expand_patterns, expand_pattern, copy_files, commit_changes, PatternError
+from homework_deployer.event import Event
 
 
 class TestExecute(unittest.TestCase):
@@ -20,11 +20,11 @@ class TestExecute(unittest.TestCase):
     Test suite for the execute function.
     """
 
-    @patch("src.executor.shutil.rmtree")
-    @patch("src.executor.commit_changes")
-    @patch("src.executor.copy_files")
-    @patch("src.executor.expand_patterns")
-    @patch("src.executor.clone_repo")
+    @patch("homework_deployer.executor.shutil.rmtree")
+    @patch("homework_deployer.executor.commit_changes")
+    @patch("homework_deployer.executor.copy_files")
+    @patch("homework_deployer.executor.expand_patterns")
+    @patch("homework_deployer.executor.clone_repo")
     def test_01_successful_execution(
         self,
         mock_clone: MagicMock,

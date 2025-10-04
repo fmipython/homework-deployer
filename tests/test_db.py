@@ -7,8 +7,8 @@ from unittest.mock import patch, mock_open, MagicMock
 import json
 from datetime import datetime
 
-from src.db import load, add, remove
-from src.event import Event
+from homework_deployer.db import load, add, remove
+from homework_deployer.event import Event
 
 
 class TestLoad(unittest.TestCase):
@@ -53,7 +53,7 @@ class TestAdd(unittest.TestCase):
 
     @patch("builtins.open", new_callable=mock_open)
     @patch("json.dump")
-    @patch("src.db.load")
+    @patch("homework_deployer.db.load")
     def test_01_add_new_event(self, mock_load: MagicMock, mock_json_dump: MagicMock, mock_file: MagicMock) -> None:
         """
         Verify that add correctly stores a new event.
@@ -88,7 +88,7 @@ class TestRemove(unittest.TestCase):
     """
 
     @patch("builtins.open", new_callable=mock_open)
-    @patch("src.db.load")
+    @patch("homework_deployer.db.load")
     def test_01_remove_existing_event(self, mock_load: MagicMock, mock_file: MagicMock) -> None:
         """
         Verify that remove correctly deletes an existing event.
@@ -105,7 +105,7 @@ class TestRemove(unittest.TestCase):
         self.assertEqual(written_data, {})
 
     @patch("builtins.open", new_callable=mock_open)
-    @patch("src.db.load")
+    @patch("homework_deployer.db.load")
     def test_02_remove_non_existing_event(self, mock_load: MagicMock, mock_file: MagicMock) -> None:
         """
         Verify that remove does nothing for non-existing event.

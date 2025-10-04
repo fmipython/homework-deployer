@@ -1,11 +1,11 @@
-import src.at as at
-import src.constants as const
-import src.db as db
+import homework_deployer.at as at
+import homework_deployer.constants as const
+import homework_deployer.db as db
 
-from src.cli import get_args
-from src.event import Event
+from homework_deployer.cli import get_args
+from homework_deployer.event import Event
 
-from src.executor import execute
+from homework_deployer.executor import execute
 
 
 def main() -> None:

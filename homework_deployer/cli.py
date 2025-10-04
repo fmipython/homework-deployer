@@ -6,7 +6,7 @@ import argparse
 
 from typing import Any
 
-from src.constants import VERSION, ActionType
+from homework_deployer.constants import VERSION, ActionType
 
 
 def get_args() -> dict[str, Any]:

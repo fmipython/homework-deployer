@@ -7,8 +7,8 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime
 
 
-from src.at import is_at_available, register, deregister
-from src.event import Event
+from homework_deployer.at import is_at_available, register, deregister
+from homework_deployer.event import Event
 
 
 class TestIsAtAvailable(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestIsAtAvailable(unittest.TestCase):
     Test suite for the is_at_available function.
     """
 
-    @patch("src.at.run")
+    @patch("homework_deployer.at.run")
     def test_01_run_returns_0(self, mock_run: MagicMock) -> None:
         """
         Verify that is_at_available returns True when 'which at' command succeeds.
@@ -30,7 +30,7 @@ class TestIsAtAvailable(unittest.TestCase):
         # Assert
         self.assertTrue(actual_result)
 
-    @patch("src.at.run")
+    @patch("homework_deployer.at.run")
     def test_02_run_returns_non_zero(self, mock_run: MagicMock) -> None:
         """
         Verify that is_at_available returns False when 'which at' command fails.
@@ -50,7 +50,7 @@ class TestRegister(unittest.TestCase):
     Test suite for the register function.
     """
 
-    @patch("src.at.run")
+    @patch("homework_deployer.at.run")
     def test_01_successful_registration(self, mock_run: MagicMock) -> None:
         """
         Verify that register returns the correct job ID when 'at' command succeeds.
@@ -74,7 +74,7 @@ class TestRegister(unittest.TestCase):
         # Assert
         self.assertEqual(actual_result, 42)
 
-    @patch("src.at.run")
+    @patch("homework_deployer.at.run")
     def test_02_failed_registration(self, mock_run: MagicMock) -> None:
         """
         Verify that register returns None when 'at' command fails.
@@ -98,7 +98,7 @@ class TestRegister(unittest.TestCase):
         # Assert
         self.assertIsNone(actual_result)
 
-    @patch("src.at.run")
+    @patch("homework_deployer.at.run")
     def test_03_verify_command_execution(self, mock_run: MagicMock) -> None:
         """
         Verify that register executes 'at' command with correct parameters.
@@ -132,7 +132,7 @@ class TestDeregister(unittest.TestCase):
     Test suite for the deregister function.
     """
 
-    @patch("src.at.run")
+    @patch("homework_deployer.at.run")
     def test_01_successful_deregistration(self, mock_run: MagicMock) -> None:
         """
         Verify that deregister returns True when 'at' command succeeds.
@@ -147,7 +147,7 @@ class TestDeregister(unittest.TestCase):
         # Assert
         self.assertTrue(actual_result)
 
-    @patch("src.at.run")
+    @patch("homework_deployer.at.run")
     def test_02_failed_deregistration(self, mock_run: MagicMock) -> None:
         """
         Verify that deregister returns False when 'at' command fails.
@@ -162,7 +162,7 @@ class TestDeregister(unittest.TestCase):
         # Assert
         self.assertFalse(actual_result)
 
-    @patch("src.at.run")
+    @patch("homework_deployer.at.run")
     def test_03_verify_command_execution(self, mock_run: MagicMock) -> None:
         """
         Verify that deregister executes 'at' command with correct parameters.
