@@ -17,7 +17,9 @@ def load(db_path: str) -> dict[str, tuple[int, str]]:
 
     try:
         with open(db_path, "r", encoding="utf-8") as db_file:
-            return json.load(db_file)
+            content = json.load(db_file)
+            content = {k: tuple(v) for k, v in content.items()}
+            return content
     except FileNotFoundError:
         return {}
 
@@ -30,7 +32,7 @@ def add(db_path: str, event: Event, config_path: str, at_id: int) -> None:
     :param event: The Event object to add.
     """
     db = load(db_path)
-    db[event.id] = at_id, config_path
+    db[event.id] = (at_id, config_path)
 
     with open(db_path, "w", encoding="utf-8") as db_file:
         json.dump(db, db_file, indent=4)
