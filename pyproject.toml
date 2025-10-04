@@ -3,11 +3,18 @@ name = "homework-deployer"
 version = "1.0.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 dependencies = [
     "gitpython>=3.1.45",
     "pydantic>=2.11.9",
+    "setuptools>=80.9.0",
 ]
+
+[build-system]
+requires = [
+  "setuptools >= 80.9.0",
+]
+build-backend = "setuptools.build_meta"
 
 [dependency-groups]
 dev = [
