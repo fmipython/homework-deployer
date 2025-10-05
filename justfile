@@ -1,11 +1,6 @@
 venv:
     . .venv/bin/activate
 
-init:
-    python3 -m venv .venv
-    venv
-    pip install -r requirements.txt
-
 lint: venv
     python3 -m pylint homework_deployer homework-deployer.py --fail-under 9
     mypy homework_deployer homework-deployer.py --ignore-missing-imports
@@ -24,3 +19,12 @@ coverage: venv
 
 run: venv
     python3 -m homework_deployer
+
+build: 
+    uv build
+
+clean:
+    rm -rf __pycache__
+    rm -rf .mypy_cache
+    rm -rf dist
+    rm -rf homework_deployer.egg-info
