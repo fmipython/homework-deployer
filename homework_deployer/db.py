@@ -21,6 +21,8 @@ def load(db_path: str) -> dict[str, tuple[int, str]]:
             content = {k: tuple(v) for k, v in content.items()}
             return content
     except FileNotFoundError:
+        with open(db_path, "w", encoding="utf-8") as db_file:
+            json.dump({}, db_file)
         return {}
 
 

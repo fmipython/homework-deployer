@@ -2,6 +2,7 @@
 Module to handle scheduling deployment events using the 'at' command-line utility.
 """
 
+import logging
 import sys
 
 from subprocess import run
@@ -9,6 +10,8 @@ from typing import Optional
 
 import homework_deployer.constants as const
 from homework_deployer.event import Event
+
+logger = logging.getLogger("homework_deployer")
 
 
 def is_at_available() -> bool:
@@ -35,11 +38,23 @@ def register(event: Event) -> Optional[int]:
 
     output = run(at_command, input=command_to_execute, check=False, text=True, capture_output=True)
 
+    logger.debug("at command: %s", " ".join(at_command))
+    logger.debug("at command input: %s", command_to_execute)
+    logger.debug("at command output: %s/%s", output.stdout, output.stderr)
+
     if output.returncode != 0:
+        logger.error("Failed to register event %s with 'at'", event.id)
         return None
 
-    at_id = int(output.stderr.split()[1])
-    return at_id
+    for line in output.stderr.splitlines():
+        if "job" in line:
+            at_id = int(line.split()[1])
+            logger.info("Registered event %s with at id %d", event.id, at_id)
+            return at_id
+
+    logger.error("Failed to parse 'at' output for event %s", event.id)
+
+    return None
 
 
 def deregister(at_id: int) -> bool:
@@ -63,5 +78,5 @@ def build_command(event: Event) -> str:
     :param event: The Event object containing deployment details.
     :return: The command string to be executed.
     """
-    command = f"{sys.executable} {const.SCRIPT_PATH} run --event-id {event.id} --no-push --no-remove"
+    command = f"{sys.executable} -m homework_deployer run {event.id} --no-push --no-remove"
     return command
