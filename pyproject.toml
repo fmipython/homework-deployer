@@ -10,6 +10,9 @@ dependencies = [
     "setuptools>=80.9.0",
 ]
 
+[project.scripts]
+homework-deployer = "homework_deployer:main"
+
 [build-system]
 requires = [
   "setuptools >= 80.9.0",
