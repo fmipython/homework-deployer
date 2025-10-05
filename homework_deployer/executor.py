@@ -2,6 +2,7 @@
 Module contains functions to execute deployment events.
 """
 
+import logging
 import shutil
 from pathlib import Path
 from typing import Optional
@@ -10,6 +11,8 @@ from git import Repo
 
 import homework_deployer.constants as const
 from homework_deployer.event import Event
+
+logger = logging.getLogger("homework_deployer")
 
 
 def execute(event: Event, is_no_push: bool = False, is_no_remove: bool = False) -> None:
@@ -27,6 +30,9 @@ def execute(event: Event, is_no_push: bool = False, is_no_remove: bool = False) 
         str(cloned_destination_repo.working_dir),
         event.patterns,
     )
+
+    logger.info("Event %s: Copying %d files", event.id, len(paths))
+
     copy_files(paths)
     commit_changes(cloned_destination_repo, f"Automated commit for event {event.id}")
 
