@@ -78,5 +78,8 @@ def build_command(event: Event) -> str:
     :param event: The Event object containing deployment details.
     :return: The command string to be executed.
     """
-    command = f"{sys.executable} -m homework_deployer run {event.id} --no-push --no-remove"
-    return command
+    command = [sys.executable, "-m", "homework_deployer", "run", event.id]
+    if event.is_dry_run:
+        command.append("--no-push")
+        command.append("--no-remove")
+    return " ".join(command)

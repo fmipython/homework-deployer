@@ -14,5 +14,6 @@
             "*.py",
             null
         ]
-    ]
+    ],
+    "is_dry_run": true
 }

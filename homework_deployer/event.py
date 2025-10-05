@@ -19,3 +19,4 @@ class Event(BaseModel):
     destination: str
     date: datetime
     patterns: list[tuple[str, Optional[str]]]
+    is_dry_run: bool = False
