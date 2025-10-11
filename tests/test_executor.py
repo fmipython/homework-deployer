@@ -2,6 +2,8 @@
 Tests for the executor module.
 """
 
+import os
+import shutil
 import unittest
 from datetime import datetime
 from pathlib import Path
@@ -14,11 +16,9 @@ import homework_deployer.constants as const
 from homework_deployer.executor import (
     execute,
     clone_repo,
-    expand_patterns,
-    expand_pattern,
     copy_files,
     commit_changes,
-    PatternError,
+    expand_patterns,
 )
 from homework_deployer.event import Event
 
@@ -110,188 +110,6 @@ class TestCloneRepo(unittest.TestCase):
             clone_repo(url, destination)
 
 
-class TestExpandPatterns(unittest.TestCase):
-    """
-    Test suite for the expand_patterns function.
-    """
-
-    @patch("pathlib.Path.glob")
-    def test_01_single_pattern_no_destination(self, mock_glob: MagicMock) -> None:
-        """
-        Verify correct path pairs for pattern without destination.
-        """
-        # Arrange
-        source_path = "/source"
-        dest_path = "/dest"
-        patterns: list[tuple[str, str | None]] = [("*.txt", None)]
-        mock_glob.return_value = [Path("test.txt")]
-
-        # Act
-        result = expand_patterns(source_path, dest_path, patterns)
-
-        # Assert
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0], (Path("/source/test.txt"), Path("/dest/test.txt")))
-
-    @patch("pathlib.Path.glob")
-    @patch("pathlib.Path.is_file")
-    def test_03_source_glob_with_file_destination(self, mock_is_file: MagicMock, mock_glob: MagicMock) -> None:
-        """
-        Verify correct path transformations for patterns with destinations.
-        """
-        # Arrange
-        source_path = "/source"
-        dest_path = "/dest"
-        patterns: list[tuple[str, str | None]] = [("c/*.py", "h/a.py")]
-        mock_glob.side_effect = [[Path("/source/c/e.txt")], [Path("/source/c/test.py")]]
-        mock_is_file.return_value = True
-
-        # Act
-        with self.assertRaises(PatternError):
-            _ = expand_patterns(source_path, dest_path, patterns)
-
-
-class TestExpandPattern(unittest.TestCase):
-    """
-    Test suite for the expand_pattern function.
-    """
-
-    def test_01_file_to_none_pattern(self) -> None:
-        """
-        Verify correct path pair for file-to-file pattern.
-        """
-        # Arrange
-        source_repo = Path("/source")
-        destination_repo = Path("/dest")
-        source_file = Path("c/e.txt")
-        destination_pattern = None
-
-        expected_source = source_repo / source_file
-        expected_destination = destination_repo / source_file
-
-        # Act
-        actual_source, actual_destination = expand_pattern(
-            source_file, destination_pattern, source_repo, destination_repo
-        )
-
-        # Assert
-        self.assertEqual(actual_source, expected_source)
-        self.assertEqual(actual_destination, expected_destination)
-
-    def test_02_file_to_file_pattern(self) -> None:
-        """
-        Verify correct path pair for file-to-file pattern.
-        """
-        # Arrange
-        source_repo = Path("/source")
-        destination_repo = Path("/dest")
-        source_file = Path("c/e.txt")
-        destination_pattern = "d/g.txt"
-
-        expected_source = source_repo / source_file
-        expected_destination = destination_repo / Path(destination_pattern)
-
-        # Act
-        actual_source, actual_destination = expand_pattern(
-            source_file, destination_pattern, source_repo, destination_repo
-        )
-
-        # Assert
-        self.assertEqual(actual_source, expected_source)
-        self.assertEqual(actual_destination, expected_destination)
-
-    @patch("pathlib.Path.is_dir")
-    def test_03_file_to_directory_pattern(self, mock_is_dir: MagicMock) -> None:
-        """
-        Verify correct path pair for file-to-file pattern.
-        """
-        # Arrange
-        source_repo = Path("/source")
-        destination_repo = Path("/dest")
-        source_file = MagicMock(spec=Path, path=Path("c/e.txt"))
-        source_file.name = "e.txt"
-        source_file.is_absolute.return_value = False
-        source_file.is_file.return_value = True
-
-        mock_is_dir.return_value = True
-
-        destination_pattern = "h"
-
-        expected_source = source_repo / source_file
-        expected_destination = destination_repo / Path(destination_pattern) / source_file.name
-
-        # Act
-        actual_source, actual_destination = expand_pattern(
-            source_file, destination_pattern, source_repo, destination_repo
-        )
-
-        # Assert
-        self.assertEqual(actual_source, expected_source)
-        self.assertEqual(actual_destination, expected_destination)
-
-    def test_04_directory_to_none_pattern(self) -> None:
-        """
-        Verify correct path pair for file-to-file pattern.
-        """
-        # Arrange
-        source_repo = Path("/source")
-        destination_repo = Path("/dest")
-        source_file = Path("c")
-        destination_pattern = None
-
-        expected_source = source_repo / source_file
-        expected_destination = destination_repo / source_file
-
-        # Act
-        actual_source, actual_destination = expand_pattern(
-            source_file, destination_pattern, source_repo, destination_repo
-        )
-
-        # Assert
-        self.assertEqual(actual_source, expected_source)
-        self.assertEqual(actual_destination, expected_destination)
-
-    @patch("pathlib.Path.is_file")
-    @patch("pathlib.Path.is_dir")
-    def test_05_directory_to_file_pattern(self, mock_is_dir: MagicMock, mock_is_file: MagicMock) -> None:
-        """
-        Verify correct path pair for file-to-file pattern.
-        """
-        # Arrange
-        source_repo = Path("/source")
-        destination_repo = Path("/dest")
-        source_file = Path("c/e.txt")
-        destination_pattern = "d/g.txt"
-
-        mock_is_file.return_value = True
-        mock_is_dir.return_value = True
-        # Act
-        with self.assertRaises(PatternError):
-            _ = expand_pattern(source_file, destination_pattern, source_repo, destination_repo)
-
-    def test_06_directory_to_directory_pattern(self) -> None:
-        """
-        Verify correct path pair for file-to-file pattern.
-        """
-        # Arrange
-        source_repo = Path("/source")
-        destination_repo = Path("/dest")
-        source_file = Path("c")
-        destination_pattern = "h"
-
-        expected_source = source_repo / source_file
-        expected_destination = destination_repo / Path(destination_pattern)
-
-        # Act
-        actual_source, actual_destination = expand_pattern(
-            source_file, destination_pattern, source_repo, destination_repo
-        )
-
-        # Assert
-        self.assertEqual(actual_source, expected_source)
-        self.assertEqual(actual_destination, expected_destination)
-
-
 class TestCopyFiles(unittest.TestCase):
     """
     Test suite for the copy_files function.
@@ -370,3 +188,147 @@ class TestCommitChanges(unittest.TestCase):
         mock_repo.git.add.assert_called_once_with(A=True)
         mock_repo.index.commit.assert_not_called()
         mock_repo.remote.assert_not_called()
+
+
+class TestPatterns(unittest.TestCase):
+    temp_dir = os.path.join("/tmp", "test_patterns")
+
+    def setUp(self) -> None:
+        if os.path.exists(TestPatterns.temp_dir):
+            shutil.rmtree(TestPatterns.temp_dir)
+
+        os.makedirs(TestPatterns.temp_dir)
+
+        first_dir = os.path.join(TestPatterns.temp_dir, "A")
+        os.makedirs(first_dir)
+
+        first_sub_dir = os.path.join(first_dir, "c")
+        os.makedirs(first_sub_dir)
+
+        first_file = os.path.join(first_sub_dir, "e.txt")
+
+        with open(first_file, "w+") as file:
+            file.write("Temp file")
+
+        second_file = os.path.join(first_sub_dir, "j.txt")
+
+        with open(second_file, "w+") as file:
+            file.write("Temp file")
+
+        return super().setUp()
+
+    def tearDown(self) -> None:
+        shutil.rmtree(TestPatterns.temp_dir)
+        return super().tearDown()
+
+    def test_01_file_to_none(self) -> None:
+        # Arrange
+        file_pattern = os.path.join("c", "e.txt")
+        source_path = os.path.join(TestPatterns.temp_dir, "A")
+        destination_path = os.path.join(TestPatterns.temp_dir, "B")
+
+        expected_paths = [(Path(source_path) / file_pattern, Path(destination_path) / file_pattern)]
+
+        # Act
+        actual_paths = expand_patterns(source_path, destination_path, [(file_pattern, None)])
+
+        # Assert
+        self.assertEqual(actual_paths, expected_paths)
+
+    def test_02_file_to_file(self) -> None:
+        # Arrange
+        file_pattern = os.path.join("c", "e.txt")
+        source_path = os.path.join(TestPatterns.temp_dir, "A")
+        destination_path = os.path.join(TestPatterns.temp_dir, "B")
+        destination_pattern = os.path.join("d", "g.txt")
+
+        expected_paths = [(Path(source_path) / file_pattern, Path(destination_path) / destination_pattern)]
+
+        # Act
+        actual_paths = expand_patterns(source_path, destination_path, [(file_pattern, destination_pattern)])
+
+        # Assert
+        self.assertEqual(actual_paths, expected_paths)
+
+    def test_03_file_to_directory(self) -> None:
+        # Arrange
+        file_pattern = os.path.join("c", "e.txt")
+        source_path = os.path.join(TestPatterns.temp_dir, "A")
+        destination_path = os.path.join(TestPatterns.temp_dir, "B")
+        destination_pattern = os.path.join("h")
+
+        expected_paths = [(Path(source_path) / file_pattern, Path(destination_path) / destination_pattern / "e.txt")]
+
+        # Act
+        actual_paths = expand_patterns(source_path, destination_path, [(file_pattern, destination_pattern)])
+
+        # Assert
+        self.assertEqual(actual_paths, expected_paths)
+
+    def test_04_directory_to_none(self) -> None:
+        # Arrange
+        file_pattern = "c"
+        source_path = os.path.join(TestPatterns.temp_dir, "A")
+        destination_path = os.path.join(TestPatterns.temp_dir, "B")
+
+        expected_paths = [(Path(source_path) / file_pattern, Path(destination_path) / file_pattern)]
+
+        # Act
+        actual_paths = expand_patterns(source_path, destination_path, [(file_pattern, None)])
+
+        # Assert
+        self.assertEqual(actual_paths, expected_paths)
+
+    def test_05_directory_to_directory(self) -> None:
+        # Arrange
+        file_pattern = "c"
+        source_path = os.path.join(TestPatterns.temp_dir, "A")
+        destination_path = os.path.join(TestPatterns.temp_dir, "B")
+        destination_pattern = "h"
+
+        expected_paths = [(Path(source_path) / file_pattern, Path(destination_path) / destination_pattern)]
+
+        # Act
+        actual_paths = expand_patterns(source_path, destination_path, [(file_pattern, destination_pattern)])
+
+        # Assert
+        self.assertEqual(actual_paths, expected_paths)
+
+    def test_06_glob_to_none(self) -> None:
+        # Arrange
+        file_pattern = "c/*.txt"
+        source_path = os.path.join(TestPatterns.temp_dir, "A")
+        destination_path = os.path.join(TestPatterns.temp_dir, "B")
+
+        expected_paths = set(
+            [
+                (Path(source_path) / "c" / "e.txt", Path(destination_path) / "c" / "e.txt"),
+                (Path(source_path) / "c" / "j.txt", Path(destination_path) / "c" / "j.txt"),
+            ]
+        )
+
+        # Act
+        actual_paths = set(expand_patterns(source_path, destination_path, [(file_pattern, None)]))
+
+        # Assert
+        self.assertEqual(actual_paths, expected_paths)
+
+    def test_07_glob_to_directory(self) -> None:
+        # Arrange
+        file_pattern = "c/*.txt"
+        source_path = os.path.join(TestPatterns.temp_dir, "A")
+        destination_path = os.path.join(TestPatterns.temp_dir, "B")
+        destination_pattern = "h"
+
+        expected_paths = set(
+            [
+                (Path(source_path) / "c" / "e.txt", Path(destination_path) / destination_pattern / "e.txt"),
+                (Path(source_path) / "c" / "j.txt", Path(destination_path) / destination_pattern / "j.txt"),
+            ]
+        )
+
+        # Act
+        actual_paths = set(expand_patterns(source_path, destination_path, [(file_pattern, destination_pattern)]))
+
+        # Assert
+        self.assertEqual(actual_paths, expected_paths)
