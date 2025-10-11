@@ -44,7 +44,7 @@ If `A` and `B` are the root of the repositories.
 ||None|File (`d/g.txt`)|Directory (`B/h`)|
 |----|----|----|----|
 |**File** (`A/c/e.txt`)|`B/c/e.txt`|`B/d/g.txt`|`B/h/e.txt`|
-|**Directory** (`A/c`)|`B/c`|Error|`B/h`|
-|**Glob** (`A/c/*.py`)|`B/c/*.py`|Error|`B/h/*.py`|
+|**Directory** (`A/c`)|`B/c`|Not supported|`B/h`|
+|**Glob** (`A/c/*.py`)|`B/c/*.py`|Not supported|`B/h/*.py`|
 
 *Note - no need to pass the repo path in the patterns part.*
