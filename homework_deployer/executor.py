@@ -69,52 +69,42 @@ def expand_patterns(
     source_repo = Path(source_path)
     destination_repo = Path(destination_path)
 
-    result = []
-
-    for source_pattern, dest_pattern in patterns:
-        if (
-            any(char in source_pattern for char in ("*", "?", "[", "]"))
-            and dest_pattern is not None
-            and Path(dest_pattern).is_file()
-        ):
-            raise PatternError("Destination pattern cannot be file if source pattern is a glob")
-        for path in source_repo.glob(source_pattern):
-            result.append(expand_pattern(path, dest_pattern, source_repo, destination_repo))
-
+    result = [
+        extract_pattern(source_repo, destination_repo, destination_pattern, source)
+        for source_pattern, destination_pattern in patterns
+        for source in list(source_repo.glob(source_pattern))
+    ]
     return result
 
 
-def expand_pattern(
-    source_file: Path, dest_pattern: Optional[str], source_repo: Path, destination_repo: Path
+def extract_pattern(
+    source_repo: Path, destination_repo: Path, destination_pattern: Optional[str], source: Path
 ) -> tuple[Path, Path]:
     """
-    Generate source and destination file paths for a single file and pattern.
+    Expand file pattern
 
-    :param source_file: Path object for the source file.
-    :param dest_pattern: Optional destination pattern.
-    :param source_repo: Path object for the source repository root.
-    :param destination_repo: Path object for the destination repository root.
-    :return: Tuple of source and destination file paths.
+    :param source_repo: _description_
+    :param destination_repo: _description_
+    :param destination_pattern: _description_
+    :param source: _description_
+    :return: _description_
     """
+    source = source.relative_to(source_repo)
 
-    if source_file.is_absolute():
-        source_file = source_file.relative_to(source_repo)
+    # Calling relative_to, to strip the repo, if present
+    source_full_path = source_repo / source
 
-    source_full_path = source_repo / source_file
-
-    if dest_pattern is None:
-        destination_full_path = destination_repo / source_file
+    if destination_pattern is None:
+        destination_full_path = destination_repo / source
     else:
-        dest_pattern_path = Path(dest_pattern)
-
-        if source_file.is_dir() and dest_pattern_path.is_file():
-            raise PatternError("Cannot use directory pattern for file source")
-
-        if source_file.is_file() and dest_pattern_path.is_dir():
-            dest_pattern_path = dest_pattern_path / source_file.name
-
-        destination_full_path = destination_repo / dest_pattern_path
-
+        destination = Path(destination_pattern)
+        if source_full_path.is_file():
+            if destination.suffix != "":
+                destination_full_path = destination_repo / destination
+            else:
+                destination_full_path = destination_repo / destination / source.name
+        else:
+            destination_full_path = destination_repo / destination
     return source_full_path, destination_full_path
 
 
