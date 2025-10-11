@@ -31,14 +31,10 @@ class TestLoad(unittest.TestCase):
         # Assert
         self.assertEqual(actual_result, test_data)
 
-    @patch("builtins.open")
-    def test_02_file_not_found(self, mock_file: MagicMock) -> None:
+    def test_02_file_not_found(self) -> None:
         """
         Verify that load returns empty dict when file doesn't exist.
         """
-        # Arrange
-        mock_file.side_effect = FileNotFoundError()
-
         # Act
         actual_result = load("test.json")
 
