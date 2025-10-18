@@ -2,6 +2,7 @@
 Module contains functions to execute deployment events.
 """
 
+import datetime
 import logging
 import shutil
 from pathlib import Path
@@ -22,8 +23,14 @@ def execute(event: Event, is_no_push: bool = False, is_no_remove: bool = False) 
 
     :param event: The Event object containing deployment details.
     """
-    cloned_source_repo = clone_repo(event.origin, const.SOURCE_REPO_DIR)
-    cloned_destination_repo = clone_repo(event.destination, const.DESTINATION_REPO_DIR)
+    now = datetime.datetime.now()
+    run_id = f"run_{event.id}{now.strftime('%y%m%d%H%M%S')}"
+    run_dir = Path(const.WORK_DIR) / run_id
+    source_repo_dir = run_dir / const.SOURCE_REPO_DIR
+    destination_repo_dir = run_dir / const.DESTINATION_REPO_DIR
+
+    cloned_source_repo = clone_repo(event.origin, source_repo_dir)
+    cloned_destination_repo = clone_repo(event.destination, destination_repo_dir)
 
     paths = expand_patterns(
         str(cloned_source_repo.working_dir),
@@ -43,7 +50,7 @@ def execute(event: Event, is_no_push: bool = False, is_no_remove: bool = False) 
         shutil.rmtree(const.WORK_DIR)
 
 
-def clone_repo(url: str, destination: str) -> Repo:
+def clone_repo(url: str, destination: Path) -> Repo:
     """
     Clone a git repository to a specified destination.
 
@@ -51,7 +58,7 @@ def clone_repo(url: str, destination: str) -> Repo:
     :param destination: The local path where the repository should be cloned.
     :return: The cloned Repo object.
     """
-    return Repo.clone_from(url, destination)
+    return Repo.clone_from(url, str(destination))
 
 
 def expand_patterns(

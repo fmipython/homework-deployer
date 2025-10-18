@@ -28,6 +28,7 @@ class TestExecute(unittest.TestCase):
     Test suite for the execute function.
     """
 
+    @patch("datetime.datetime")
     @patch("homework_deployer.executor.shutil.rmtree")
     @patch("homework_deployer.executor.commit_changes")
     @patch("homework_deployer.executor.copy_files")
@@ -40,6 +41,7 @@ class TestExecute(unittest.TestCase):
         mock_copy: MagicMock,
         mock_commit: MagicMock,
         mock_rmtree: MagicMock,
+        mock_time: MagicMock,
     ) -> None:
         """
         Verify that execute successfully processes an event.
@@ -60,12 +62,19 @@ class TestExecute(unittest.TestCase):
         mock_clone.side_effect = [mock_source_repo, mock_dest_repo]
         mock_expand.return_value = [(Path("/source/test.txt"), Path("/dest/test.txt"))]
 
+        mocked_time = "251018010203"
+        mock_time.now.return_value.strftime.return_value = mocked_time
+
+        mocked_run_id = f"run_{event.id}{mocked_time}"
+        expected_source_dir = Path(const.WORK_DIR) / mocked_run_id / const.SOURCE_REPO_DIR
+        expected_destination_dir = Path(const.WORK_DIR) / mocked_run_id / const.DESTINATION_REPO_DIR
+
         # Act
         execute(event)
 
         # Assert
-        mock_clone.assert_any_call(event.origin, const.SOURCE_REPO_DIR)
-        mock_clone.assert_any_call(event.destination, const.DESTINATION_REPO_DIR)
+        mock_clone.assert_any_call(event.origin, expected_source_dir)
+        mock_clone.assert_any_call(event.destination, expected_destination_dir)
         mock_expand.assert_called_once()
         mock_copy.assert_called_once()
         mock_commit.assert_called_once()
