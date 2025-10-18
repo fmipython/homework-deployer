@@ -28,3 +28,4 @@ clean:
     rm -rf .mypy_cache
     rm -rf dist
     rm -rf homework_deployer.egg-info
+    rm -rf *.log*
