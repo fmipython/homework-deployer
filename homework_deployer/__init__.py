@@ -41,6 +41,7 @@ def run(logger: logging.Logger, event_id: str, is_no_push: bool, is_no_remove: b
 
     logger.info("Manually running event %s", event.id)
     execute(event, is_no_push or event.is_dry_run, is_no_remove or event.is_dry_run)
+    deregister(event_id)
 
 
 def list_events() -> None:
