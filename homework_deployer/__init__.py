@@ -37,8 +37,7 @@ def main() -> None:
 def run(logger: logging.Logger, event_id: str, is_no_push: bool, is_no_remove: bool) -> None:
     events = db.load(const.DB_PATH)
     config_path = events[event_id][1]
-    with open(config_path, "r", encoding="utf-8") as config:
-        event = Event.model_validate_json(config.read())
+    event = load_event(config_path, event_id)
 
     logger.info("Manually running event %s", event.id)
     execute(event, is_no_push or event.is_dry_run, is_no_remove or event.is_dry_run)
@@ -69,11 +68,24 @@ def register(config_path: str) -> None:
     Register a deployment event from a configuration file.
     :param config_path: Path to the event configuration file.
     """
-    with open(config_path, "r", encoding="utf-8") as config:
-        event = Event.model_validate_json(config.read())
-
+    new_id = db.get_next_free_id(config_path)
+    event = load_event(config_path, new_id)
     at_id = at.register(event)
 
     if at_id is not None:
         db.add(const.DB_PATH, event, config_path, at_id)
         print("Registered event with id:", event.id)
+
+
+def load_event(config_path: str, target_id: str) -> Event:
+    """
+    Create an Event object from a JSON file.
+
+    :param config_path: The path to the JSON file
+    :return: An event object
+    """
+    with open(config_path, "r", encoding="utf-8") as config:
+        event = Event.model_validate_json(config.read(), context={"id": "1"})
+
+    event.id = target_id
+    return event

@@ -53,3 +53,16 @@ def remove(db_path: str, event_id: str) -> None:
 
         with open(db_path, "w", encoding="utf-8") as db_file:
             json.dump(db, db_file, indent=4)
+
+
+def get_next_free_id(db_path: str) -> str:
+    existing_ids = set(int(_id) for _id in load(db_path).keys())
+
+    highest_id = max(existing_ids)
+
+    # If there is a hole in ids, this will find it
+    for candidate_id in range(highest_id):
+        if candidate_id not in existing_ids:
+            return str(candidate_id)
+
+    return str(highest_id + 1)

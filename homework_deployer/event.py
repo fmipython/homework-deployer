@@ -4,7 +4,7 @@ Event model representing a deployment event.
 
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Event(BaseModel):
@@ -12,7 +12,7 @@ class Event(BaseModel):
     Deployment event model.
     """
 
-    id: str
+    id: str = Field(exclude=True, default="")
     name: str
     description: str
     origin: str
