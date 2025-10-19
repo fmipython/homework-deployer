@@ -41,6 +41,7 @@ def run(logger: logging.Logger, event_id: str, is_no_push: bool, is_no_remove: b
 
     logger.info("Manually running event %s", event.id)
     execute(event, is_no_push or event.is_dry_run, is_no_remove or event.is_dry_run)
+
     deregister(event_id)
 
 
@@ -50,7 +51,7 @@ def list_events() -> None:
     """
     events = db.load(const.DB_PATH)
     for event_id, (at_id, config_path) in events.items():
-        print(f"Event ID: {event_id}, Config Path: {config_path}, At id: {at_id}")
+        print(f"Event ID: {event_id}, Config Path: {config_path}, At id: {at_id}, Scheduled at: {at.get_time(at_id)}")
 
 
 def deregister(event_id: str) -> None:
@@ -69,7 +70,7 @@ def register(config_path: str) -> None:
     Register a deployment event from a configuration file.
     :param config_path: Path to the event configuration file.
     """
-    new_id = db.get_next_free_id(config_path)
+    new_id = db.get_next_free_id(const.DB_PATH)
     event = load_event(config_path, new_id)
     at_id = at.register(event)
 

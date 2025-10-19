@@ -71,6 +71,29 @@ def deregister(at_id: int) -> bool:
     return output.returncode == 0
 
 
+def get_time(at_id: int) -> str:
+    """
+    Get the scheduled execution time of a given event
+
+    :param at_id: _description_
+    :return: _description_
+    """
+    at_command = [const.AT_BINARY, "-l"]
+
+    process_result = run(at_command, check=False, text=True, capture_output=True)
+
+    output = process_result.stdout.split("\n")
+
+    for line in output:
+        components = line.split()
+        if line == "":
+            continue
+        if str(at_id) == components[0]:
+            return " ".join(components[1:6])
+
+    return ""
+
+
 def build_command(event: Event) -> str:
     """
     Build the command to be scheduled with 'at' for executing the deployment event.
