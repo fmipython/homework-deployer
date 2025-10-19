@@ -56,12 +56,20 @@ def remove(db_path: str, event_id: str) -> None:
 
 
 def get_next_free_id(db_path: str) -> str:
+    """
+    Return the next free event id.
+
+    :param db_path: Path to the DB
+    :return: The next free id
+    """
     existing_ids = set(int(_id) for _id in load(db_path).keys())
 
+    if len(existing_ids) == 0:
+        return "1"
     highest_id = max(existing_ids)
 
     # If there is a hole in ids, this will find it
-    for candidate_id in range(highest_id):
+    for candidate_id in range(1, highest_id + 1):
         if candidate_id not in existing_ids:
             return str(candidate_id)
 
