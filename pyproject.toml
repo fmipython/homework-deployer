@@ -3,9 +3,10 @@ name = "homework-deployer"
 version = "1.0.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "gitpython>=3.1.45",
+    "py-cove",
     "setuptools>=80.9.0",
 ]
 
@@ -36,3 +37,6 @@ details = "low"
 
 [tool.complexipy.output]
 json = true
+
+[tool.uv.sources]
+py-cove = { git = "https://github.com/lyubolp/py-cove", rev = "main" }
