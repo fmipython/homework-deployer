@@ -2,8 +2,11 @@
 Main module
 """
 
-from homework_deployer import main
+
+def stage(homework: str):
+    # 1. Clone the staging repository to a temporary directory
+    pass
 
 
 if __name__ == "__main__":
-    main()
+    print("Hello world!")
