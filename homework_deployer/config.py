@@ -8,3 +8,6 @@ class Settings(BaseSettings):
     cove_url: str = ""
     cove_api_key: str = ""
     cove_project: str = ""
+
+
+settings = Settings()
