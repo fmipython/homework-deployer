@@ -8,3 +8,9 @@ class DeploymentConfig(BaseModel):
     config_file: str
     solution_files: list[str]
     structure_file: Optional[str] = None
+
+
+class CoveConfig(BaseModel):
+    url: str
+    api_key: str
+    project: str

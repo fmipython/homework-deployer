@@ -2,21 +2,20 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
-from cove_sdk import CoveAPIError, CoveClient
+from cove_sdk import CoveAPIError, CoveClient, ResourceType, build_uri
 
-from homework_deployer.config import settings
 from homework_deployer.exceptions import CoveException
-from homework_deployer.models import DeploymentConfig
+from homework_deployer.models import CoveConfig, DeploymentConfig
 
 
-def build_config(homework_dir: Path, deployment: DeploymentConfig) -> str:
-    with CoveClient(base_url=settings.cove_url, api_key=settings.cove_api_key) as client:
-        project = client.projects.get(settings.cove_project)
+def build_config(homework_dir: Path, deployment: DeploymentConfig, cove_config: CoveConfig) -> str:
+    with CoveClient(base_url=cove_config.url, api_key=cove_config.api_key) as client:
+        project = client.projects.get(cove_config.project)
 
-        if project is None:
-            raise CoveException(f"Project '{settings.cove_project}' not found in Cove.")
+        if project is None or project.id is None:
+            raise CoveException(f"Project '{cove_config.project}' not found in Cove.")
 
-        # TODO - Reset project
+        client.projects.delete_items(project.id)
 
         test_file_keys = []
 
@@ -33,11 +32,11 @@ def build_config(homework_dir: Path, deployment: DeploymentConfig) -> str:
         with open(raw_config_path, "r") as f:
             raw_config = json.load(f)
 
-        config = _patch_raw_config(raw_config, test_file_keys)
+        config = _patch_raw_config(raw_config, test_file_keys, cove_config)
 
         client.json_items.create(project_id=project.id, key="config", value=config)
 
-        return _generate_cove_url(settings.cove_url, settings.cove_project, "json_item", "config")
+        return build_uri(cove_config.url, ResourceType.JSON_ITEM, cove_config.project, "config")
 
 
 def _upload_python_code(client: CoveClient, project_id: str, key: str, code_file: Path) -> None:
@@ -46,18 +45,13 @@ def _upload_python_code(client: CoveClient, project_id: str, key: str, code_file
     client.python_items.create(project_id=project_id, key=key, code=content)
 
 
-def _generate_cove_url(base_url: str, project_id: str, item_type: str, key: str) -> str:
-    # TODO - This could move to cove ?
-    return f"cove://{base_url}/{item_type}/{project_id}/{key}"
-
-
-def _patch_raw_config(raw_config: dict, test_file_keys: list[str]) -> dict:
+def _patch_raw_config(raw_config: dict, test_file_keys: list[str], cove_config: CoveConfig) -> dict:
     config = deepcopy(raw_config)
 
     for check in config["checks"]:
         if check["name"] == "tests":
             check["tests_path"] = [
-                _generate_cove_url(settings.cove_url, settings.cove_project, "python_item", test_file_key)
+                build_uri(cove_config.url, ResourceType.PYTHON_ITEM, cove_config.project, test_file_key)
                 for test_file_key in test_file_keys
             ]
 
