@@ -3,11 +3,18 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    # Staging
     staging_repo: str = ""
+    staging_cove_url: str = ""
+    staging_cove_api_key: str = ""
+    staging_cove_project: str = ""
+
+    # Production
     production_repo: str = ""
-    cove_url: str = ""
-    cove_api_key: str = ""
-    cove_project: str = ""
+    production_cove_url: str = ""
+    production_cove_api_key: str = ""
+    production_cove_project: str = ""
 
 
 settings = Settings()
