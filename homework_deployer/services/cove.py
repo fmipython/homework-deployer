@@ -2,13 +2,13 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
-from cove_sdk import CoveAPIError, CoveClient, ResourceType, build_uri
+from cove_sdk import CoveClient, ResourceType, build_uri
 
 from homework_deployer.exceptions import CoveException
 from homework_deployer.models import CoveConfig, DeploymentConfig
 
 
-def build_config(homework_dir: Path, deployment: DeploymentConfig, cove_config: CoveConfig) -> str:
+def load_pygrader_config_in_cove(homework_dir: Path, deployment: DeploymentConfig, cove_config: CoveConfig) -> str:
     with CoveClient(base_url=cove_config.url, api_key=cove_config.api_key) as client:
         project = client.projects.get(cove_config.project)
 
