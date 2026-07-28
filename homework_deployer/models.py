@@ -5,8 +5,8 @@ from pydantic import BaseModel
 
 class DeploymentConfig(BaseModel):
     test_files: list[str] = []
-    config_file: str
-    solution_files: list[str]
+    config_file: str  # TODO - No hidden tests supported for now
+    solution_directory: str
     structure_file: Optional[str] = None
 
 
