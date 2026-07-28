@@ -8,6 +8,7 @@ dependencies = [
     "gitpython>=3.1.45",
     "py-cove",
     "pydantic-settings>=2.14.2",
+    "pygrader",
     "setuptools>=80.9.0",
 ]
 
@@ -42,3 +43,4 @@ json = true
 
 [tool.uv.sources]
 py-cove = { git = "https://github.com/lyubolp/py-cove", rev = "v1.4.0" }
+pygrader = { git = "https://github.com/fmipython/pygrader", rev = "v1.13.0" }
