@@ -23,7 +23,7 @@ def load_pygrader_config_in_cove(homework_dir: Path, deployment: DeploymentConfi
 
         for test_file in deployment.test_files:
             test_file_path = homework_dir / test_file
-            test_file_key = f"test_code/{test_file}"
+            test_file_key = f"test_code_{test_file}".replace("/", "_").removesuffix(".py")
 
             _upload_python_code(client, project.id, test_file_key, test_file_path)
 
@@ -56,7 +56,7 @@ def load_pygrader_config_in_cove(homework_dir: Path, deployment: DeploymentConfi
 def _upload_python_code(client: CoveClient, project_id: str, key: str, code_file: Path) -> None:
     content = code_file.read_text()
 
-    client.python_items.create(project_id=project_id, key=key.replace("/", "_"), code=content)
+    client.python_items.create(project_id=project_id, key=key, code=content)
 
 
 def _patch_raw_config(
@@ -70,5 +70,9 @@ def _patch_raw_config(
                 build_uri(cove_config.url, ResourceType.PYTHON_ITEM, cove_config.project, test_file_key)
                 for test_file_key in test_file_keys
             ]
-
+        elif check["name"] == "structure":
+            if structure_file_uri is not None:
+                check["structure_file"] = structure_file_uri
+            else:
+                raise CoveException("Structure check specified but no structure file provided in deployment config.")
     return config
