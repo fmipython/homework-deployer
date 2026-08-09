@@ -14,7 +14,5 @@ def clone_repository(repo_url: str, destination: str) -> None:
     """
     try:
         Repo.clone_from(repo_url, destination)
-        print(f"Repository cloned successfully to {destination}")
     except Exception as e:
         print(f"An error occurred while cloning the repository: {e}")
-
