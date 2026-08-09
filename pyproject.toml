@@ -43,4 +43,4 @@ json = true
 
 [tool.uv.sources]
 py-cove = { git = "https://github.com/lyubolp/py-cove", rev = "v1.4.0" }
-pygrader = { git = "https://github.com/fmipython/pygrader", rev = "v1.13.0" }
+pygrader = { git = "https://github.com/fmipython/pygrader", rev = "v1.13.1" }

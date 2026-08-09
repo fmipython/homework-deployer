@@ -397,7 +397,7 @@ requires-dist = [
     { name = "gitpython", specifier = ">=3.1.45" },
     { name = "py-cove", git = "https://github.com/lyubolp/py-cove?rev=v1.4.0" },
     { name = "pydantic-settings", specifier = ">=2.14.2" },
-    { name = "pygrader", git = "https://github.com/fmipython/pygrader?rev=v1.13.0" },
+    { name = "pygrader", git = "https://github.com/fmipython/pygrader?rev=v1.13.1" },
     { name = "setuptools", specifier = ">=80.9.0" },
 ]
 
@@ -760,8 +760,8 @@ wheels = [
 
 [[package]]
 name = "pygrader"
-version = "1.13.0"
-source = { git = "https://github.com/fmipython/pygrader?rev=v1.13.0#3ea1444f662226bed37165d9c11f7ccb12aecac7" }
+version = "1.13.1"
+source = { git = "https://github.com/fmipython/pygrader?rev=v1.13.1#ea8183933ee16072f2c19f2002d925ebae1994a0" }
 dependencies = [
     { name = "dotenv" },
     { name = "py-cove" },
