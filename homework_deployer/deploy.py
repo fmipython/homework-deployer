@@ -5,6 +5,7 @@ Deployment logic
 import os
 import tempfile
 from pathlib import Path
+from typing import Optional
 
 from homework_deployer.config import settings
 from homework_deployer.models import CoveConfig, DeploymentConfig
@@ -13,9 +14,9 @@ from homework_deployer.services.git import clone_repository
 from homework_deployer.services.pygrader import run_pygrader
 
 
-def stage() -> dict:
+def stage(commit: Optional[str] = None) -> dict:
     with tempfile.TemporaryDirectory() as temp_dir:
-        clone_repository(settings.staging_repo, temp_dir)
+        clone_repository(settings.staging_repo, temp_dir, commit)
 
         homework_directory = Path(temp_dir) / settings.current_homework
 
@@ -39,5 +40,5 @@ def stage() -> dict:
         return {"status": "success", "results": grader_results}
 
 
-def prod() -> dict:
+def prod(commit: Optional[str] = None) -> dict:
     raise NotImplementedError("The 'prod' action is not implemented yet")
