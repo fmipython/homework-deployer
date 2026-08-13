@@ -1,6 +1,4 @@
-"""
-Command-line interface
-"""
+"""Command-line interface."""
 
 import argparse
 import json
@@ -9,6 +7,7 @@ from homework_deployer.deploy import prod, stage
 
 
 def main() -> None:
+    """Parse CLI arguments and run the selected deployment action."""
     parser = argparse.ArgumentParser(prog="homework-deployer")
     parser.add_argument("action", choices=["stage", "prod"])
     parser.add_argument("--commit", default=None, help="Git commit SHA to check out instead of the latest commit")

@@ -1,7 +1,11 @@
+"""Application settings loaded from the environment."""
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    """Staging and production repo/Cove configuration, loaded from `.env`."""
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     current_homework: str = ""

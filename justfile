@@ -2,10 +2,10 @@ venv:
     . .venv/bin/activate
 
 lint: venv
-    python3 -m pylint homework_deployer homework-deployer.py --fail-under 9
-    mypy homework_deployer homework-deployer.py --ignore-missing-imports
-    flake8 homework_deployer homework-deployer.py
-    complexipy .
+    uv run ruff check homework_deployer homework-deployer.py --fix
+    uv run ruff format homework_deployer homework-deployer.py
+    uv run mypy homework_deployer homework-deployer.py --ignore-missing-imports
+    uv run complexipy .
 
 test: venv
     python3 -m unittest discover -s tests

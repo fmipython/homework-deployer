@@ -388,7 +388,6 @@ dev = [
     { name = "coverage" },
     { name = "flake8" },
     { name = "mypy" },
-    { name = "pylint" },
     { name = "ruff" },
 ]
 
@@ -407,7 +406,6 @@ dev = [
     { name = "coverage", specifier = ">=7.10.7" },
     { name = "flake8", specifier = ">=7.3.0" },
     { name = "mypy", specifier = ">=1.18.2" },
-    { name = "pylint", specifier = ">=3.3.8" },
     { name = "ruff", specifier = ">=0.15.20" },
 ]
 

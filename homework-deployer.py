@@ -1,6 +1,4 @@
-"""
-Script entry point
-"""
+"""Script entry point."""
 
 from homework_deployer import main
 

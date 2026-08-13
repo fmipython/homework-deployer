@@ -1,6 +1,4 @@
-"""
-Package entry point
-"""
+"""Package entry point."""
 
 from homework_deployer.cli import main
 

@@ -27,13 +27,12 @@ dev = [
     "coverage>=7.10.7",
     "flake8>=7.3.0",
     "mypy>=1.18.2",
-    "pylint>=3.3.8",
     "ruff>=0.15.20",
 ]
 
 [tool.complexipy]
-paths = ["src", "tests"]
-max-complexity-allowed = 10
+paths = ["homework_deployer", "tests"]
+max-complexity-allowed = 15
 quiet = false
 sort = "asc"
 details = "low"

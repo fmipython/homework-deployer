@@ -1,3 +1,5 @@
+"""Upload a homework's tests and pygrader config into Cove."""
+
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -10,6 +12,7 @@ from homework_deployer.models import CoveConfig, DeploymentConfig
 
 
 def load_pygrader_config_in_cove(homework_dir: Path, deployment: DeploymentConfig, cove_config: CoveConfig) -> str:
+    """Upload the homework's test files and patched pygrader config to Cove, returning the config's URI."""
     cove_base_url = "http://" + cove_config.url.strip("/")
     with CoveClient(base_url=cove_base_url, api_key=cove_config.api_key) as client:
         project = client.projects.get(cove_config.project)

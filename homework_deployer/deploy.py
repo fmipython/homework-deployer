@@ -1,6 +1,4 @@
-"""
-Deployment logic
-"""
+"""Deployment logic."""
 
 import os
 import tempfile
@@ -15,6 +13,7 @@ from homework_deployer.services.pygrader import run_pygrader
 
 
 def stage(commit: Optional[str] = None) -> dict:
+    """Clone the staging repo, push the homework's tests to Cove, and grade the solution."""
     with tempfile.TemporaryDirectory() as temp_dir:
         clone_repository(settings.staging_repo, temp_dir, commit)
 
@@ -41,4 +40,5 @@ def stage(commit: Optional[str] = None) -> dict:
 
 
 def prod(commit: Optional[str] = None) -> dict:
+    """Promote a verified homework from staging to production."""
     raise NotImplementedError("The 'prod' action is not implemented yet")

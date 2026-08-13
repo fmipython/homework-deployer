@@ -1,3 +1,5 @@
+"""Git repository operations."""
+
 from typing import Optional
 
 from git import Repo
