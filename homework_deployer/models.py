@@ -8,6 +8,7 @@ from pydantic import BaseModel
 class DeploymentConfig(BaseModel):
     """Per-homework manifest describing which files to deploy."""
 
+    statement_file: str
     test_files: list[str] = []
     config_file: str  # TODO - No hidden tests supported for now
     solution_directory: str
